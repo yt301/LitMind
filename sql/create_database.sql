@@ -1,0 +1,1 @@
+create database LitMind charset utf8;
