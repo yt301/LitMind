@@ -10,10 +10,12 @@ class UserLoginIn(BaseModel):
     password: str
     email: str = None  # 使用 EmailStr 类型自动校验邮箱
 
+
 class UserRegisterIn(BaseModel):
     username: str = None
     password: str
     email: EmailStr = None  # 使用 EmailStr 类型自动校验邮箱
+
     # 校验器
     @field_validator("username")
     @classmethod
@@ -33,7 +35,6 @@ class UserRegisterIn(BaseModel):
 
 class LiteratureIn(BaseModel):
     title: str
-    id: int = None  # 文献ID可选，用于更新时传入
     author: str
     publication_date: date
     doi: str

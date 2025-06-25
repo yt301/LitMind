@@ -30,7 +30,7 @@ async def add_literatures(username: str, literature_in: LiteratureIn, current_us
     # 确保当前用户有权访问该用户的文献记录
     if current_user.username != username:
         return create_response("error", 403, "无权访问其他用户的文献记录！")
-    literatures_existing = await Literature.filter(doi=literature_in.doi,users__username=username).first()
+    literatures_existing = await Literature.filter(doi=literature_in.doi, users__username=username).first()
     if literatures_existing:
         return create_response("error", 409, "文献记录已存在！")
     else:
@@ -45,44 +45,40 @@ async def add_literatures(username: str, literature_in: LiteratureIn, current_us
             reference_doi=literature_in.reference_doi
         )
         # 关联用户
-        await literature.users.add(current_user) # 将当前用户添加到文献记录的用户列表中
-        return create_response("success", 200,  literature)
+        await literature.users.add(current_user)  # 将当前用户添加到文献记录的用户列表中
+        return create_response("success", 200, literature)
 
 
 # 更新指定用户的文献记录
-@literatures.put("/")
-async def update_literatures():
-    return {
-        "message": "修改文献",
-        "data": [
-            {"id": 1, "title": "文献1", "author": "作者1"},
-            {"id": 2, "title": "文献2", "author": "作者2"}
-        ]
-    }
+@literatures.put("/{username}")
+async def update_literatures(username: str, literature_in: LiteratureIn,
+                             current_user: User = Depends(get_current_user)):
+    # 确保当前用户有权访问该用户的文献记录
+    if current_user.username != username:
+        return create_response("error", 403, "无权访问其他用户的文献记录！")
+    literatures_existing = await Literature.filter(doi=literature_in.doi, users__username=username).first()
+    if not literatures_existing:
+        return create_response("error", 404, "文献记录不存在！")
+    if is_equal(literatures_existing, literature_in):
+        return create_response("error", 400, "修改后的文献记录与原先一致！")
+    # 更新文献记录
+    await Literature.filter(doi=literature_in.doi, users__username=username).update(**literature_in.model_dump())
+    return create_response("success", 200, literatures_existing)
 
 
 # 删除文献记录
-@literatures.delete("/")
-async def delete_literatures():
-    return {
-        "message": "删除文献",
-        "data": [
-            {"id": 1, "title": "文献1", "author": "作者1"},
-            {"id": 2, "title": "文献2", "author": "作者2"}
-        ]
-    }
-
-
-# 删除指定用户的文献记录
 @literatures.delete("/{username}")
-async def delete_literatures(username: str, current_user: User = Depends(get_current_user)):
-    return {
-        "message": "删除文献",
-        "data": [
-            {"id": 1, "title": "文献1", "author": "作者1"},
-            {"id": 2, "title": "文献2", "author": "作者2"}
-        ]
-    }
+async def delete_literatures(username: str, doi_in: str, current_user: User = Depends(get_current_user)):
+    # 确保当前用户有权访问该用户的文献记录
+    if current_user.username != username:
+        return create_response("error", 403, "无权访问其他用户的文献记录！")
+    # 先查询符合条件的文献
+    literatures_delete = await Literature.filter(doi=doi_in, users__username=username)
+    if not literatures_delete:
+        return create_response("error", 404, "文献记录不存在！")
+    delete_count = await Literature.filter(doi=doi_in).delete()  # 删除文献记录
+    return create_response("success",200,{"delete_count":delete_count})
+
 
 
 # 搜索文献记录
