@@ -5,4 +5,4 @@
  在终端运行如下指令：
  迁移命令：aerich init -t config.CONFIG
  初始化数据库：aerich init-db
-
+3.文件上传路径：config.py中的UPLOAD_PATH

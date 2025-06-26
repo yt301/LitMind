@@ -1,15 +1,17 @@
 import uvicorn
-from fastapi import FastAPI, Request,status
+from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
-from routes import auth, literatures, search
+from routes import auth, literatures, search, files
 from tortoise.contrib.fastapi import register_tortoise
 from tools import *
 from config import CONFIG
+
 app = FastAPI()
 app.include_router(auth, prefix='/auth', tags=['登录相关接口'])  # 注册路由
 app.include_router(literatures, prefix='/literatures', tags=['文献记录管理相关接口'])  # 注册路由
 app.include_router(search, prefix='/search', tags=['文献搜索相关接口'])
+app.include_router(files, prefix='/files', tags=['文件管理相关接口'])
 
 # 连接数据库
 register_tortoise(
@@ -36,8 +38,6 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
             data=f"参数校验失败: {error_field} - {error_msg}"
         )
     )
-
-
 
 
 if __name__ == '__main__':

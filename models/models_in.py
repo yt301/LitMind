@@ -2,7 +2,7 @@ from datetime import date
 from pydantic import BaseModel, EmailStr, field_validator, Field
 from models import User
 from enum import Enum
-from typing import Optional, Dict
+from typing import Optional, Dict,List
 
 
 class UserLoginIn(BaseModel):
@@ -21,6 +21,8 @@ class UserRegisterIn(BaseModel):
     @classmethod
     def check_username(cls, value: str):
         assert len(value) >= 4, "用户名至少为4位"
+        assert len(value) <= 16, "用户名不超过16位"
+        assert value.isalnum(), "用户名只能包含字母和数字"
         return value
 
     # 校验器
@@ -44,6 +46,9 @@ class LiteratureIn(BaseModel):
     is_referenced_by_count: int = 0  # 被引用次数，默认为0
     score: float = 0.0  # Crossref评分，默认为0.0
 
+
+class FilenameIn(BaseModel):
+    filename:List[str]
 
 
 # 定义排序方式的枚举

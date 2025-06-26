@@ -67,7 +67,8 @@ class File(Model):
     file_name = fields.CharField(max_length=255, description='文件名')
     file_path = fields.CharField(max_length=255, description='文件存储路径')
     file_size = fields.IntField(description='文件大小（字节）')
-    upload_time = fields.DatetimeField(auto_now_add=True, description='上传时间')
+    file_type = fields.CharField(max_length=255, description='文件类型')
+    upload_time = fields.DatetimeField(auto_now_add=True, description='上传时间')  # 自动赋值
     # 一对多
     user = fields.ForeignKeyField('models.User', related_name='files', description='关联用户')
 
@@ -79,9 +80,12 @@ class File(Model):
 # 翻译文件记录模型定义
 class Translation(Model):
     id = fields.IntField(pk=True, description='主键')
+    file_name = fields.CharField(max_length=255, description='文件名')
     file_path = fields.CharField(max_length=255, description='翻译文件存储路径')
+    file_size = fields.IntField(description='文件大小（字节）')
+    file_type = fields.CharField(max_length=255, description='文件类型')
     source_language = fields.CharField(max_length=50, description='源语言')
-    target_language = fields.CharField(max_length=50, description='目标语言')
+    translated_language = fields.CharField(max_length=50, description='翻译文件语言')
     translation_time = fields.DatetimeField(auto_now_add=True, description='翻译时间')
     style = fields.CharField(max_length=50, description='翻译风格', null=True, default=None)
     # 一对多

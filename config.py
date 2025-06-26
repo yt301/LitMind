@@ -19,3 +19,5 @@ CONFIG={
                     }
                 }
             }
+
+FILE_PATH=fr'D:\Desktop\启真问智比赛\LitMind\upload_files'
