@@ -29,9 +29,16 @@ async def add_literatures(username: str, literature_in: LiteratureIn, current_us
     # 确保当前用户有权访问该用户的文献记录
     if current_user.username != username:
         return create_response("error", 403, "无权访问其他用户的文献记录！")
-    literatures_existing = await Literature.filter(doi=literature_in.doi, users__username=username).first()
+    literatures_existing = await Literature.filter(doi=literature_in.doi).first()
     if literatures_existing:
-        return create_response("error", 409, "文献记录已存在！")
+        # 检查当前用户是否已关联该文献
+        is_associated = await literatures_existing.users.filter(id=current_user.id).exists()
+        if is_associated:
+            return create_response("error", 409, "文献记录已存在！")
+        else:
+            # 关联当前用户到该文献
+            await literatures_existing.users.add(current_user)
+            return create_response("success", 200, "由于文献记录存在，故将已存在文献记录关联此用户！")
     else:
         # 创建文献记录
         literature = await Literature.create(
