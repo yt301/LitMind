@@ -1,0 +1,87 @@
+{
+    "status" (状态) : "ok",
+    "message-type" (消息类型) : "work-list",
+    "message-version" (消息版本) : "1.0.0",
+    "message" (消息内容) : {
+        "facets" (筛选条件) : {},
+        "total-results" (总结果数) : 1021162,
+        "items" (项目列表) : [
+            {
+                "indexed" (索引信息) : {
+                    "date-parts" (索引日期的组成部分) : [[2023, 5, 30]],
+                    "date-time" (索引的完整日期和时间) : "2023-05-30T04:02:42Z",
+                    "timestamp" (索引的时间戳) : 1685419362047
+                },
+                "reference-count" (参考文献数量) : 25,
+                "publisher" (出版商) : "National Library of Serbia",
+                "issue" (期刊期号) : "99",
+                "content-domain" (内容领域) : {
+                    "domain" (领域列表) : [],
+                    "crossmark-restriction" (跨标记限制) : False
+                },
+                "short-container-title" (简短的容器标题) : ["Publ Inst Math (Belgr)", "PUBL I MATH", "PUBL I MATH BEOGRAD", "PUBL I MATH NOUV SER", "PUBLICATIONS I MATH"],
+                "published-print" (印刷出版信息) : {"date-parts" (印刷出版日期的组成部分) : [[2009]]},
+                "abstract" (摘要) : "<jats:p>We introduce distribution groups and [B0,... ,Bn,C0,...,Cn-1]- groups with not necessarily densely defined generators and systematically analyze relations between them.</jats:p>",
+                "DOI" (数字对象标识符) : "10.2298/pim0999063k",
+                "type" (文献类型) : "journal-article",
+                "created" (创建信息) : {
+                    "date-parts" (创建日期的组成部分) : [[2009, 5, 26]],
+                    "date-time" (创建的完整日期和时间) : "2009-05-26T08:33:15Z",
+                    "timestamp" (创建的时间戳) : 1243326795000
+                },
+                "page" (页码) : "63-106",
+                "source" (数据来源) : "Crossref",
+                "is-referenced-by-count" (被引用次数) : 0,
+                "title" (标题) : ["Distribution groups"],
+                "prefix" (前缀) : "10.2298",
+                "volume" (卷号) : "85",
+                "author" (作者列表) : [
+                    {
+                        "given" (名字) : "Marko",
+                        "family" (姓氏) : "Kostic",
+                        "sequence" (作者顺序) : "first",
+                        "affiliation" (隶属机构) : [{"name" (机构名称) : "Faculty of Technical Sciences, Novi Sad"}]
+                    }
+                ],
+                "member" (成员) : "1078",
+                "reference" (参考文献列表) : [
+                    {"key" (引用键) : "1", "doi-asserted-by" (DOI 断言者) : "publisher", "DOI" (引用文献的DOI) : "10.1006/jmaa.1994.1318"},
+                    ...
+                    {"key" (引用键) : "25", "doi-asserted-by" (DOI 断言者) : "publisher", "DOI" (引用文献的DOI) : "10.4064/sm152-1-4"}
+                ],
+                "container-title" (容器标题) : ["Publications de l'Institut Mathematique", "Publications de l'Institut Math?matique (Belgrade)"],
+                "language" (语言) : "en",
+                "deposited" (提交信息) : {
+                    "date-parts" (提交日期的组成部分) : [[2023, 5, 29]],
+                    "date-time" (提交的完整日期和时间) : "2023-05-29T10:25:55Z",
+                    "timestamp" (提交的时间戳) : 1685355955000
+                },
+                "score" (分数) : 9.021725,
+                "resource" (资源信息) : {
+                    "primary" (主要资源) : {
+                        "URL" (资源链接) : "https://doiserbia.nb.rs/Article.aspx?ID=0350-13020999063K"
+                    }
+                },
+                "issued" (发布信息) : {"date-parts" (发布日期的组成部分) : [[2009]]},
+                "references-count" (引用文献数量) : 25,
+                "journal-issue" (期刊期信息) : {
+                    "issue" (期号) : "99",
+                    "published-print" (印刷出版信息) : {"date-parts" (印刷出版日期的组成部分) : [[2009]]}
+                },
+                "URL" (文章链接) : "https://doi.org/10.2298/pim0999063k",
+                "ISSN" (国际标准连续出版物号) : ["0350-1302", "1820-7405"],
+                "issn-type" (ISSN类型) : [
+                    {"value" (ISSN值) : "0350-1302", "type" (类型) : "print"},
+                    {"value" (ISSN值) : "1820-7405", "type" (类型) : "electronic"}
+                ],
+                "published" (出版信息) : {"date-parts" (出版日期的组成部分) : [[2009]]}
+            },
+            ...
+        ],
+        "items-per-page" (每页项目数) : 10,
+        "query" (查询条件) : {
+            "start-index" (起始索引) : 0,
+            "search-terms" (搜索关键词) : "math"
+        }
+    }
+}

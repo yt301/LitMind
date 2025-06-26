@@ -1,10 +1,9 @@
-from Demos.win32ts_logoff_disconnected import username
 from fastapi import APIRouter, Depends
 from tools import *
 from models import *
 from .auth import get_current_user
 
-# 文献相关的路由
+# 文献记录管理相关的路由
 literatures = APIRouter()
 
 
@@ -79,15 +78,3 @@ async def delete_literatures(username: str, doi_in: str, current_user: User = De
     delete_count = await Literature.filter(doi=doi_in).delete()  # 删除文献记录
     return create_response("success",200,{"delete_count":delete_count})
 
-
-
-# 搜索文献记录
-@literatures.get("/search")
-async def get_literatures():
-    return {
-        "message": "搜索文献",
-        "data": [
-            {"id": 1, "title": "文献1", "author": "作者1"},
-            {"id": 2, "title": "文献2", "author": "作者2"}
-        ]
-    }

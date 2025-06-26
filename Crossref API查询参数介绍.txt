@@ -1,0 +1,28 @@
+一、filter
+格式示例：
+"filter":"from-pub-date:2013-01-01"
+"filter":"until-pub-date:2020-01-01,from-pub-date:2010-01-01"
+参数说明：
+①from-pub-date  表示从指定日期开始的出版物。格式为YYYY-MM-DD。
+②until-pub-date    表示到指定日期结束的出版物。格式为YYYY-MM-DD。
+
+二、sort
+格式示例：
+"sort":"relevance"
+参数说明：
+①relevance  表示相关性排序。（递减）
+②published  表示出版日期排序。（递减）
+③score  表示Crossref评分排序。（递减）
+④is-referenced-by-count  表示被引用次数排序。（递减）
+
+三、rows
+格式示例：
+"rows":20
+参数说明：
+①rows  表示返回的结果数量。默认值为10，最大值为1000。
+
+四、offset
+格式示例：
+"offset":0
+参数说明：
+①offset  表示结果的偏移量。默认值为0。
