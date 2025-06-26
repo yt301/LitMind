@@ -41,6 +41,9 @@ class LiteratureIn(BaseModel):
     url: str
     reference_count: int
     reference_doi: list[str] = []  # 参考文献的DOI列表，默认为空列表
+    is_referenced_by_count: int = 0  # 被引用次数，默认为0
+    score: float = 0.0  # Crossref评分，默认为0.0
+
 
 
 # 定义排序方式的枚举
@@ -60,7 +63,7 @@ class SearchIn(BaseModel):
         rows: 每页返回数量（1-1000，默认10）
         offset: 分页偏移量（从0开始，默认0）
         sort: 排序方式（默认按相关性）
-        filters: 过滤条件字符串（格式：'field:value'，如 'from-pub-date:2023,type:journal-article'）
+        filter: 过滤条件字符串（格式：'field:value'，如 'from-pub-date:2023,type:journal-article'）
     """
     query: str = Field(..., description="搜索关键词（必填）")
     rows: int = Field(

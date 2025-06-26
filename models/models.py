@@ -37,6 +37,9 @@ class Literature(Model):
     url = fields.CharField(max_length=255, description='文献链接')
     reference_count = fields.IntField(description='参考文献数量')
     reference_doi = fields.JSONField(default=list, description='参考文献的DOI列表')
+    is_referenced_by_count = fields.IntField(default=0, description='被引用次数')
+    score = fields.FloatField(default=0.0, description='Crossref评分')
+
     # 多对多关系，关联用户
     users = fields.ManyToManyField('models.User', related_name='literatures', description='关联用户')
 
