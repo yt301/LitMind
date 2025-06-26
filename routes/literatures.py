@@ -65,7 +65,8 @@ async def update_literatures(username: str, literature_in: LiteratureIn,
         return create_response("error", 400, "修改后的文献记录与原先一致！")
     # 更新文献记录
     await Literature.filter(doi=literature_in.doi, users__username=username).update(**literature_in.model_dump())
-    return create_response("success", 200, literatures_existing)
+    literature_changed= await Literature.filter(doi=literature_in.doi, users__username=username).first()
+    return create_response("success", 200, literature_changed)
 
 # 删除指定用户的文献记录
 @literatures.delete("/{username}")
