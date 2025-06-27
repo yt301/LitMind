@@ -2,9 +2,8 @@ from fastapi import APIRouter
 from models import *
 from fastapi.security import OAuth2PasswordBearer
 from datetime import timedelta
+
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")  # 用于保护接口
-
-
 
 # 验证token的依赖函数
 from fastapi import Depends
@@ -12,6 +11,8 @@ from tools import *
 from jose import jwt
 from fastapi import HTTPException
 from jose.exceptions import JWTError  # 实际异常定义位置
+
+
 # 该函数于从 JWT 令牌中提取当前用户信息，并验证该用户是否存在。它通常用于保护需要用户登录的路由，确保只有经过身份验证的用户才能访问这些路由。
 async def get_current_user(token: str = Depends(oauth2_scheme)):
     try:
@@ -26,12 +27,15 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
     if not user:
         raise HTTPException(status_code=404, detail="用户不存在")  # 如果用户不存在，抛出未找到异常
     return user
+
+
 # 保护接口：在路径函数参数中加上current_user: User = Depends(get_current_user)，即可确保只有经过身份验证的用户才能访问该接口。
 # 请求头中需带上参数 Authorization:"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyMiIsImV4cCI6MTc1MDg1ODE5MH0.GCiVVzsv92MD38gNYbiOj-OYW6tDOnd41HBD5stOsGs"
 
 
 # auth路由
 auth = APIRouter()
+
 
 @auth.post("/login")
 async def login(user_in: UserLoginIn):
@@ -48,10 +52,9 @@ async def login(user_in: UserLoginIn):
             data={"sub": user[0].username},  # 通常存用户唯一标识
             expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
         )
-        response_data =create_response("success", 200, data_out(user[0], UserOut()))
+        response_data = create_response("success", 200, data_out(user[0], UserOut()))
         response_data["access_token"] = access_token
         return response_data
-
 
 
 @auth.post("/register")
@@ -73,4 +76,3 @@ async def register(user_in: UserRegisterIn):
 @auth.post("/logout")
 async def logout():
     return create_response("success", 200, "已成功登出！")
-

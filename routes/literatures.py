@@ -16,7 +16,8 @@ async def get_literatures(username: str, current_user: User = Depends(
         return create_response("error", 403, "无权访问其他用户的文献记录！")
     # 查询该用户的文献记录
     literatures_data = await Literature.filter(users__username=username).values(
-        "id", "title", "author", "publication_date", "doi", "url", "reference_count", "reference_doi", "is_referenced_by_count","score"
+        "id", "title", "author", "publication_date", "doi", "url", "reference_count", "reference_doi",
+        "is_referenced_by_count", "score"
     )
     if not literatures_data:
         return create_response("error", 404, "没有找到该用户的文献记录！")
@@ -72,8 +73,9 @@ async def update_literatures(username: str, literature_in: LiteratureIn,
         return create_response("error", 400, "修改后的文献记录与原先一致！")
     # 更新文献记录
     await Literature.filter(doi=literature_in.doi, users__username=username).update(**literature_in.model_dump())
-    literature_changed= await Literature.filter(doi=literature_in.doi, users__username=username).first()
+    literature_changed = await Literature.filter(doi=literature_in.doi, users__username=username).first()
     return create_response("success", 200, literature_changed)
+
 
 # 删除指定用户的文献记录
 @literatures.delete("/{username}")
@@ -100,10 +102,9 @@ async def delete_literatures(username: str, doi_in: str, current_user: User = De
     if not remaining_users:
         # 如果没有其他用户关联，再删除文献实体
         await literature.delete()
-        return create_response("success", 200,  "文献记录已完全删除！")
+        return create_response("success", 200, "文献记录已完全删除！")
 
     return create_response("success", 200, "已从您的文献库中移除该文献！")
-
 
 # # 删除指定用户的文献记录
 # @literatures.delete("/{username}")

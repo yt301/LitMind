@@ -2,7 +2,7 @@ from datetime import date
 from pydantic import BaseModel, EmailStr, field_validator, Field
 from models import User
 from enum import Enum
-from typing import Optional, Dict,List
+from typing import Optional, Dict, List
 
 
 class UserLoginIn(BaseModel):
@@ -48,7 +48,7 @@ class LiteratureIn(BaseModel):
 
 
 class FilenameIn(BaseModel):
-    filename:List[str]
+    filename: List[str]
 
 
 # 定义排序方式的枚举
@@ -103,3 +103,8 @@ class SearchIn(BaseModel):
         return value
 
 
+class TranslationIn(BaseModel):
+    content: str
+    source_language: str
+    translated_language: str
+    style: str

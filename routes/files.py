@@ -15,7 +15,8 @@ files = APIRouter()
 # 查询用户的上传文件
 @files.get("/")
 async def get_files(current_user: User = Depends(get_current_user)):
-    file=await File.filter(user_id=current_user.id).values("id","file_name","file_type","file_size","file_path","upload_time")
+    file = await File.filter(user_id=current_user.id).values("id", "file_name", "file_type", "file_size", "file_path",
+                                                             "upload_time")
     return create_response("success", 200, file)
 
 
@@ -90,7 +91,7 @@ async def update_files(file_list: List[UploadFile], current_user: User = Depends
 
 # 删除文件
 @files.delete("/")
-async def delete_files(filename_in:FilenameIn, current_user: User = Depends(get_current_user)):
+async def delete_files(filename_in: FilenameIn, current_user: User = Depends(get_current_user)):
     result = {
         "success": [],
         "error": [],
@@ -114,7 +115,7 @@ async def delete_files(filename_in:FilenameIn, current_user: User = Depends(get_
 
 # 下载文件
 @files.post("/download")
-async def download_files(filename_in:FilenameIn, current_user: User = Depends(get_current_user)):
+async def download_files(filename_in: FilenameIn, current_user: User = Depends(get_current_user)):
     # result = {
     #     "success": [],
     #     "error": [],
@@ -124,18 +125,18 @@ async def download_files(filename_in:FilenameIn, current_user: User = Depends(ge
     # 检查用户目录是否存在
     user_dir = os.path.join(FILE_PATH, str(current_user.id))
     if not os.path.exists(user_dir):
-        return create_response("error", 404,"用户目录不存在")
+        return create_response("error", 404, "用户目录不存在")
     # 处理单个文件下载
     if len(filename_in.filename) == 1:
         file = filename_in.filename[0]
         filepath = os.path.join(user_dir, file)
 
         if not os.path.exists(filepath):
-            return create_response("error", 404,f"文件{file}不存在！")
+            return create_response("error", 404, f"文件{file}不存在！")
 
         # 验证文件属于当前用户
         if not await File.filter(file_name=file, user_id=current_user.id).exists():
-            return create_response("error", 403,"无权访问此文件！")
+            return create_response("error", 403, "无权访问此文件！")
 
         return FileResponse(
             filepath,
@@ -143,7 +144,7 @@ async def download_files(filename_in:FilenameIn, current_user: User = Depends(ge
             media_type="application/octet-stream"  # 通用二进制流类型
         )
     else:
-        return create_response("error", 405,"暂不支持多个文件同时下载！")
+        return create_response("error", 405, "暂不支持多个文件同时下载！")
     # # 处理多个文件下载（打包为ZIP）
     # else:
     #     import zipfile
