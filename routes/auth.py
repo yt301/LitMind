@@ -53,7 +53,9 @@ async def login(user_in: UserLoginIn):
             expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
         )
         response_data = create_response("success", 200, data_out(user[0], UserOut()))
-        response_data["access_token"] = access_token
+        response_data["Authorization"]= f"Bearer {access_token}"
+        # response_data["access_token"] = access_token
+        # response_data["token_type"] = "bearer"
         return response_data
 
 

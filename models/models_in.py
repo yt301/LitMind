@@ -3,6 +3,7 @@ from pydantic import BaseModel, EmailStr, field_validator, Field
 from models import User
 from enum import Enum
 from typing import Optional, Dict, List
+import re
 
 
 class UserLoginIn(BaseModel):
@@ -103,12 +104,32 @@ class SearchIn(BaseModel):
         return value
 
 
+class DOIIn(BaseModel):
+    doi: str
+
+    @field_validator("doi")
+    @classmethod
+    def validate_doi_format(cls, value):
+        # DOI 正则表达式模式
+        # 基本格式: 10.XXXX/XXXXX
+        doi_pattern = r'^10\.\d{4,9}/[-._;()/:A-Z0-9]+$'
+
+        # 检查是否匹配模式
+        if not re.match(doi_pattern, value, re.IGNORECASE):
+            raise ValueError('Invalid DOI format. Expected format: 10.XXXX/XXXXX')
+
+        # 检查长度 (DOI 通常不超过 255 个字符)
+        if len(value) > 255:
+            raise ValueError('DOI is too long. Maximum length is 255 characters.')
+
+        return value
+
+
 class TranslationIn(BaseModel):
     content: str
     source_language: str
     translated_language: str
     style: str
-
 
     @field_validator("source_language", "translated_language")
     @classmethod
@@ -125,5 +146,3 @@ class TranslationIn(BaseModel):
         if value not in allowed_styles:
             raise ValueError(f"Style must be one of {allowed_styles}")
         return value
-
-

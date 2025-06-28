@@ -2,10 +2,11 @@
 格式示例：
 "filter":"from-pub-date:2013-01-01"
 "filter":"until-pub-date:2020-01-01,from-pub-date:2010-01-01"
+"filter":"doi:10.1007/s12325-008-0076-1"（注意：通过doi查询时，必须将query传为空值，否则可能返回空）
 参数说明：
 ①from-pub-date  表示从指定日期开始的出版物。格式为YYYY-MM-DD。
 ②until-pub-date    表示到指定日期结束的出版物。格式为YYYY-MM-DD。
-
+③doi  表示指定的数字对象标识符（DOI）。
 二、sort
 格式示例：
 "sort":"relevance"
