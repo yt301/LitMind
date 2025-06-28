@@ -9,8 +9,7 @@ from langchain_core.runnables.history import RunnableWithMessageHistory
 from .Prompts import prompt_translate
 from .tools import gain_userinput
 from dotenv import load_dotenv
-from langchain.llms import OpenAI
-
+from langchain_community.llms import OpenAI
 
 load_dotenv()
 
@@ -49,9 +48,18 @@ class ChatBotTranslate:
         ])
         self.chain = prompt | self.llm | StrOutputParser()
 
+    # 文本翻译（通用风格）
     async def gain_response(self, user_input: str, source_language: str, translated_language: str, style: str):
         input = gain_userinput(user_input, source_language, translated_language, style)
         # response = self.chain.invoke({"input": input})
         response = await self.chain.ainvoke({"input": input})  # 改用异步请求
         input["content"] = response.strip('"\\\'')  # 移除文本前后的 ", \, '
         return input
+
+    # # 文本翻译（学术风格）
+    # async def gain_academic_response(self, user_input: str, source_language: str, translated_language: str):
+    #     input = gain_userinput(user_input, source_language, translated_language, "学术风格")
+    #     # response = self.chain.invoke({"input": input})
+    #     response = await self.chain.ainvoke({"input": input})  # 改用异步请求
+    #     input["content"] = response.strip('"\\\'')  # 移除文本前后的 ", \, '
+    #     return input

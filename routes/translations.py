@@ -21,10 +21,13 @@ async def translate_file():
 # 翻译文本内容的接口
 @translations.post('/text')
 async def translate_text(translation_in: TranslationIn):
-    response = await chatbot.gain_response(
-        user_input=translation_in.content,
-        source_language=translation_in.source_language,
-        translated_language=translation_in.translated_language,
-        style=translation_in.style
-    )
-    return create_response("success", 200, response)
+    try:
+        response = await chatbot.gain_response(
+            user_input=translation_in.content,
+            source_language=translation_in.source_language,
+            translated_language=translation_in.translated_language,
+            style=translation_in.style
+        )
+        return create_response("success", 200, response)
+    except Exception as e:
+        return create_response("error", 500, str(e))
