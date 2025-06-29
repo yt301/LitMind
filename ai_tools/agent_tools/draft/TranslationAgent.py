@@ -30,7 +30,6 @@ class TranslationAgent:
             description="统计文本的字符长度（包含空格）",
             args_schema=TextLengthInput,  # 简单工具可不定义schema
             return_direct=True  # 关键修改！绕过Agent的结果处理
-
             )
 
         ]
