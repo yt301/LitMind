@@ -33,7 +33,7 @@ class ChatBotTranslate:
 
     def init_model(self):
         self.llm = ChatOpenAI(
-            temperature=0.5,
+            temperature=0,
             model="gpt-3.5-turbo",
             frequency_penalty=0.5,
             presence_penalty=0.5,
@@ -50,11 +50,11 @@ class ChatBotTranslate:
 
     # 文本翻译（通用风格）
     async def gain_response(self, user_input: str, source_language: str, translated_language: str, style: str):
-        input = gain_userinput(user_input, source_language, translated_language, style)
+        text = gain_userinput(user_input, source_language, translated_language, style)
         # response = self.chain.invoke({"input": input})
-        response = await self.chain.ainvoke({"input": input})  # 改用异步请求
-        input["content"] = response.strip('"\\\'')  # 移除文本前后的 ", \, '
-        return input
+        response = await self.chain.ainvoke({"input": text})  # 改用异步请求
+        text["content"] = response.strip('"\\\'')  # 移除文本前后的 ", \, '
+        return text
 
     # # 文本翻译（学术风格）
     # async def gain_academic_response(self, user_input: str, source_language: str, translated_language: str):
