@@ -126,7 +126,7 @@ class DOIIn(BaseModel):
 
 
 class TranslationIn(BaseModel):
-    content: str
+    text: str
     source_language: str
     translated_language: str
     style: str
@@ -142,7 +142,7 @@ class TranslationIn(BaseModel):
     @field_validator("style")
     @classmethod
     def validate_style(cls, value: str) -> str:
-        allowed_styles = {"general", "academic"}
+        allowed_styles = {"general", "academic", "literary"}
         if value not in allowed_styles:
             raise ValueError(f"Style must be one of {allowed_styles}")
         return value

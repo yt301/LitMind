@@ -1,4 +1,4 @@
-# TORTOISE_ORM
+# TORTOISE_ORM配置
 CONFIG={
                 'connections': {
                     'default': {
@@ -20,4 +20,11 @@ CONFIG={
                 }
             }
 
-FILE_PATH=fr'D:\Desktop\启真问智比赛\LitMind\upload_files'
+# 用户上传文件路径
+FILE_PATH=fr'D:\Desktop\Qizhenwenzhi_Competition\LitMind\upload_files'
+
+# 知识库路径
+KNOWLEDGE_BASE_PATH=fr'D:\Desktop\Qizhenwenzhi_Competition\LitMind\knowledge_base'
+
+# 向量存储路径（向量知识库）
+VECTOR_STORE_PATH=fr'D:\Desktop\Qizhenwenzhi_Competition\LitMind\vectorstore'

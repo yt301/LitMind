@@ -4,15 +4,16 @@ from langchain import hub
 from langchain_openai import ChatOpenAI
 from dotenv import load_dotenv
 from langchain.agents import tool
-from models_in import TranslateInput
-from TranslationTools import general_translate, academic_translate, literary_translate
+from agent_tools.InputModels import TranslateInput
+from agent_tools.TranslationTools import general_translate, academic_translate, literary_translate
 from langchain.tools import StructuredTool
 
 load_dotenv()
 
-
-# 与agent交互的方法
+# 与agent交互的方法（异步）
 # response = await self.agent_executor.ainvoke("input": {user_input})
+# 与agent交互的方法（同步）
+# response = self.agent_executor.invoke("input": {user_input})
 
 
 class TranslationAgent:

@@ -1,4 +1,4 @@
-from TranslationAgent import TranslationAgent
+from agent_tools.TranslationAgent import TranslationAgent
 import asyncio
 
 
@@ -25,28 +25,28 @@ async def main():
 
     # 测试翻译工具入口方法函数
     general_translation = await agent.translate(
-        text="Most of us compare ourselves with anyone we think is happier — a relative, someone we know a lot, or someone we hardly know. As a result, what we do remember is anything that makes others happy, anything that makes ourselves unhappy, totally forgetting that there is something happy in our own life.",
-        source_language="English",
-        translated_language="Chinese",
+        text="纳米复合材料",
+        source_language="Chinese",
+        translated_language="English",
         style="general"
     )
     print("翻译内容：", general_translation)
 
-    academic_translation = await agent.translate(
-        text="Most of us compare ourselves with anyone we think is happier — a relative, someone we know a lot, or someone we hardly know. As a result, what we do remember is anything that makes others happy, anything that makes ourselves unhappy, totally forgetting that there is something happy in our own life.",
-        source_language="English",
-        translated_language="Chinese",
-        style="academic"
-    )
-    print("翻译内容：",academic_translation)
+    # academic_translation = await agent.translate(
+    #     text="纳米复合材料",
+    #     source_language="Chinese",
+    #     translated_language="English",
+    #     style="academic"
+    # )
+    # print("翻译内容：",academic_translation)
 
-    literary_translation = await agent.translate(
-        text="Most of us compare ourselves with anyone we think is happier — a relative, someone we know a lot, or someone we hardly know. As a result, what we do remember is anything that makes others happy, anything that makes ourselves unhappy, totally forgetting that there is something happy in our own life.",
-        source_language="English",
-        translated_language="Chinese",
-        style="literary"
-    )
-    print("翻译内容：",literary_translation)
+    # literary_translation = await agent.translate(
+    #     text="Most of us compare ourselves with anyone we think is happier — a relative, someone we know a lot, or someone we hardly know. As a result, what we do remember is anything that makes others happy, anything that makes ourselves unhappy, totally forgetting that there is something happy in our own life.",
+    #     source_language="English",
+    #     translated_language="Chinese",
+    #     style="literary"
+    # )
+    # print("翻译内容：",literary_translation)
 
 
 # 运行异步函数
