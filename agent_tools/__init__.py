@@ -1,1 +1,1 @@
-from .TranslationAgent import TranslationAgent
+from .LiteratureAgent import LiteratureAgent

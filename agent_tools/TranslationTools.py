@@ -1,7 +1,7 @@
 from langchain_core.prompts import ChatPromptTemplate
-from agent_tools.Prompts import PROMPT_ACADEMIC_TRANSLATE, PROMPT_GENERAL_TRANSLATE, PROMPT_LITERARY_TRANSLATE
+from agent_tools.Prompts import PROMPT_ACADEMIC_TRANSLATE, PROMPT_GENERAL_TRANSLATE
 from langchain_core.output_parsers import StrOutputParser
-from agent_tools.tools import gain_userinput
+from agent_tools.input_tools import gain_userinput
 from agent_tools.AcademicKnowledgeBase_FAISS import AcademicKnowledgeBase
 
 # chroma向量知识库
@@ -41,14 +41,3 @@ def academic_translate(llm, text: str, source_language: str, translated_language
     return str(response).strip('"\\\'')
 
 
-def literary_translate(llm, text: str, source_language: str, translated_language: str, style: str) -> str:
-    """文学风格翻译工具，适合小说、散文等文学作品"""
-    prompt = ChatPromptTemplate.from_messages([
-        ("system", PROMPT_LITERARY_TRANSLATE),
-        ("human", "{input}")
-    ])
-    chain = prompt | llm | StrOutputParser()
-    processed_input = gain_userinput(userinput=text, source_language=source_language,
-                                     translated_language=translated_language, style="literary")
-    response = chain.invoke({"input": processed_input})
-    return str(response).strip('"\\\'')

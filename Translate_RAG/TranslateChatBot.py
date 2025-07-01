@@ -4,7 +4,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from Translate_RAG.tools import gain_userinput
 from dotenv import load_dotenv
-from Translate_RAG.TranslatePrompts import PROMPT_GENERAL_TRANSLATE, PROMPT_ACADEMIC_TRANSLATE, PROMPT_LITERARY_TRANSLATE
+from Translate_RAG.TranslatePrompts import PROMPT_GENERAL_TRANSLATE, PROMPT_ACADEMIC_TRANSLATE
 from Translate_RAG.AcademicKnowledgeBase_FAISS import AcademicKnowledgeBase
 
 load_dotenv()
@@ -20,7 +20,6 @@ class TranslateChatBot:
         self._init_model()
         self.create_general_chain()
         self.create_academic_chain()
-        self.create_literary_chain()
 
     def _init_environment(self):
         if "OPENAI_API_KEY" not in os.environ:
@@ -34,6 +33,7 @@ class TranslateChatBot:
             presence_penalty=0.4,
             streaming=True  # 添加 streaming 支持，支持更好的异步处理
         )
+
     # 创建通用风格翻译链（无RAG）
     def create_general_chain(self):
         prompt = ChatPromptTemplate.from_messages([
@@ -51,14 +51,6 @@ class TranslateChatBot:
         ])  # 添加 context 占位符用于RAG
         self.academic_chain = prompt | self.llm | StrOutputParser()
 
-    # 创建文学风格翻译链（无RAG）
-    def create_literary_chain(self):
-        prompt = ChatPromptTemplate.from_messages([
-            ("system", PROMPT_LITERARY_TRANSLATE),
-            ("human", "{input}")
-        ])
-        self.literary_chain = prompt | self.llm | StrOutputParser()
-
     async def translate(self, text: str, source_language: str, translated_language: str, style: str) -> dict:
         processed_input = gain_userinput(userinput=text, source_language=source_language,
                                          translated_language=translated_language, style=style)
@@ -71,9 +63,7 @@ class TranslateChatBot:
                 relevant_info) if relevant_info else ""
             # print("检索到的相关学术背景知识:", context)
             response = await self.academic_chain.ainvoke({"input": processed_input,"context":context})  # 改用异步请求
-        elif style == "literary":
-            response = await self.literary_chain.ainvoke({"input": processed_input})  # 改用异步请求
         else:
-            raise ValueError(f"Unsupported style: {style}. Supported styles are: general, academic, literary.")
+            raise ValueError(f"Unsupported style: {style}. Supported styles are: general, academic.")
         processed_input["text"] = str(response).strip('"\\\'')  # 移除文本前后的 ", \, '
         return processed_input

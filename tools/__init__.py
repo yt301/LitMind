@@ -4,3 +4,4 @@ from .auth_tools import get_password_hash, verify_password, create_access_token,
     SECRET_KEY, ALGORITHM
 from .literatures_tools import is_equal
 from .search_crossref_api import search_crossref,process_response
+from .search_gain_file_url import search_gain_pdf, search_gain_xml
