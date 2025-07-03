@@ -146,3 +146,52 @@ class TranslationIn(BaseModel):
         if value not in allowed_styles:
             raise ValueError(f"Style must be one of {allowed_styles}")
         return value
+
+
+class TranslationFileIn(BaseModel):
+    filename: str
+    source_language: str
+    translated_language: str
+    style: str
+
+    @field_validator("source_language", "translated_language")
+    @classmethod
+    def validate_language(cls, value: str) -> str:
+        allowed_languages = {"Chinese", "English"}
+        if value not in allowed_languages:
+            raise ValueError(f"Language must be one of {allowed_languages}")
+        return value
+
+    @field_validator("style")
+    @classmethod
+    def validate_style(cls, value: str) -> str:
+        allowed_styles = {"general", "academic"}
+        if value not in allowed_styles:
+            raise ValueError(f"Style must be one of {allowed_styles}")
+        return value
+
+
+class SummaryIn(BaseModel):
+    text: str
+    language: str = "Chinese"
+    detail_level: str = "medium"
+
+    @field_validator("language")
+    @classmethod
+    def validate_language(cls, value: str) -> str:
+        allowed_languages = {"Chinese", "English"}
+        if value not in allowed_languages:
+            raise ValueError(f"Language must be one of {allowed_languages}")
+        return value
+
+    @field_validator("detail_level")
+    @classmethod
+    def validate_detail_level(cls, value: str) -> str:
+        allowed_level = {"high", "medium", "low"}
+        if value not in allowed_level:
+            raise ValueError(f"detail_level must be one of {allowed_level}")
+        return value
+
+
+class TalkIn(BaseModel):
+    text: str

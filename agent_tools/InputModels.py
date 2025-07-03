@@ -13,7 +13,7 @@ class TranslateInput(BaseModel):
 class SummaryInput(BaseModel):
     text: str = Field(description="待总结的文献内容")
     language: str = Field(default="Chinese", description="总结输出语言(Chinese/English)")
-    detail_level: str = Field(default="standard", description="总结详细程度(brief/standard/detailed)")
+    detail_level: str = Field(default="medium", description="总结详细程度(low/medium/high)")
 
 # 定义排序方式的枚举
 class SortMethod(str, Enum):

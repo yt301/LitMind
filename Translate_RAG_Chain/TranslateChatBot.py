@@ -2,10 +2,9 @@ import os
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
-from Translate_RAG.tools import gain_userinput
 from dotenv import load_dotenv
-from Translate_RAG.TranslatePrompts import PROMPT_GENERAL_TRANSLATE, PROMPT_ACADEMIC_TRANSLATE
-from Translate_RAG.AcademicKnowledgeBase_FAISS import AcademicKnowledgeBase
+from Translate_RAG_Chain.TranslatePrompts import PROMPT_GENERAL_TRANSLATE, PROMPT_ACADEMIC_TRANSLATE
+from Translate_RAG_Chain.AcademicKnowledgeBase_FAISS import AcademicKnowledgeBase
 
 load_dotenv()
 
@@ -52,8 +51,12 @@ class TranslateChatBot:
         self.academic_chain = prompt | self.llm | StrOutputParser()
 
     async def translate(self, text: str, source_language: str, translated_language: str, style: str) -> dict:
-        processed_input = gain_userinput(userinput=text, source_language=source_language,
-                                         translated_language=translated_language, style=style)
+        processed_input = {
+            "text": text,
+            "source_language":source_language,
+            "translated_language":translated_language,
+            "style":style
+        }
         if style == "general":
             response = await self.general_chain.ainvoke({"input": processed_input})  # 改用异步请求
         elif style == "academic":

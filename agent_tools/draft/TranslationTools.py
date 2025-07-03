@@ -1,7 +1,7 @@
 from langchain_core.prompts import ChatPromptTemplate
 from ai_tools.Prompts import PROMPT_ACADEMIC_TRANSLATE, PROMPT_GENERAL_TRANSLATE
 from langchain_core.output_parsers import StrOutputParser
-from ai_tools.tools import gain_userinput
+from ai_tools.input_tools import gain_userinput
 from models_in import TranslateInput
 
 def general_translate(llm, text: str, source_language: str, translated_language: str) -> str:

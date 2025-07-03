@@ -7,7 +7,7 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_community.chat_message_histories import FileChatMessageHistory
 from langchain_core.runnables.history import RunnableWithMessageHistory
 from .Prompts import prompt_translate
-from .tools import gain_userinput
+from .input_tools import gain_userinput
 from dotenv import load_dotenv
 from langchain_community.llms import OpenAI
 
