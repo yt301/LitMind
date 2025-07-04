@@ -195,3 +195,26 @@ class SummaryIn(BaseModel):
 
 class TalkIn(BaseModel):
     text: str
+
+
+class ThemeIn(BaseModel):
+    literature_ids: List[int] = Field(..., description="文献ID列表")
+    theme: str = Field(..., description="主题标签")
+
+    @field_validator("theme")
+    @classmethod
+    def validate_tags(cls, value: str) -> str:
+        if not value or value=="None":
+            raise ValueError("主题标签列表不能为空和None")
+        return value
+
+class ThemeChangeIn(BaseModel):
+    theme_old: str = Field(..., description="原主题标签")
+    theme_new: str = Field(..., description="新主题标签")
+
+    @field_validator("theme_old","theme_new")
+    @classmethod
+    def validate_tags(cls, value: str) -> str:
+        if not value or value=="None":
+            raise ValueError("主题标签不能为空和None")
+        return value

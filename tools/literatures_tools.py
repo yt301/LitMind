@@ -2,8 +2,8 @@
 # 比较model_in和数据库的model的信息是否完全相同
 def is_equal(user, user_in):
     """
-    :param user: models实例
-    :param user_in: models_in实例
+    :param user: Literature实例
+    :param user_in: LiteratureIn实例-Pydantic 模型
     :return:相等返回True，否则False
     """
     user_in_dict = user_in.model_dump()  # 将 Pydantic 模型转换为字典
