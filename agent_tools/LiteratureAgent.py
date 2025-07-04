@@ -1,3 +1,8 @@
+from langchain.memory import ConversationSummaryBufferMemory
+from langchain_core.chat_history import BaseChatMessageHistory
+from langchain_community.chat_message_histories import FileChatMessageHistory
+from langchain_core.runnables.history import RunnableWithMessageHistory
+from langchain_core.runnables.config import RunnableConfig
 from langchain.agents import AgentExecutor, create_openai_tools_agent
 from langchain.agents import initialize_agent, Tool
 from langchain import hub
@@ -9,20 +14,52 @@ from agent_tools.SearchTools import search_tool, literature_search
 from agent_tools.SummaryTools import summarize_literature
 from langchain.tools import StructuredTool
 from agent_tools.Prompts import PROMPT_AGENT_SYSTEM
+from config import AGENT_MEMORY_DIR
+from pathlib import Path
+import os
+from typing import cast
+import tiktoken
+
 from dotenv import load_dotenv
 
 load_dotenv()
 
+# 初始化编码器（GPT-3.5/4的编码）
+GLOBAL_ENCODER = tiktoken.get_encoding("cl100k_base")
 
-# 与agent交互的方法（异步）
-# response = await self.agent_executor.ainvoke({"input": user_input})
-# 与agent交互的方法（同步）
-# response = self.agent_executor.invoke({"input": user_input})
+
+# 重写FileChatMessageHistory的messages 属性：只取最后5条消息用于后续处理，同时限制最大token数
+class LimitedHistory(FileChatMessageHistory):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.encoder = GLOBAL_ENCODER  # 引用编码器
+
+    @property
+    def messages(self):
+        messages = super().messages  # 获取完整的对话历史（从父类FileChatMessageHistory）
+        limited_messages = []
+        total_tokens = 0
+        max_tokens = 1500  # 建议值：可根据你的模型调整
+
+        # 从最新消息开始反向遍历（优先保留最近的消息）
+        for msg in reversed(messages):
+            msg_tokens = len(self.encoder.encode(msg.content))  # 精确计算当前消息的token数
+            # msg_tokens = len(msg.content) // 4  # 简单token估算（精确版需调用tiktoken）
+            if total_tokens + msg_tokens > max_tokens:
+                break
+            limited_messages.append(msg)
+            total_tokens += msg_tokens
+            if len(limited_messages) >= 5:  # 硬性条数限制
+                break
+
+        return list(reversed(limited_messages))  # 恢复时间顺序
 
 
 class LiteratureAgent:
     def __init__(self):
-        self.llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0)
+        self.llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0, max_tokens=2000)  # 初始化LLM，设置温度和最大token数
+        self.encoder = GLOBAL_ENCODER  # 引用编码器
+        self._setup_memory()  # 新增记忆初始化
         self.tools = [
             StructuredTool.from_function(
                 func=lambda text, source_language, translated_language, style: general_translate(
@@ -60,6 +97,7 @@ class LiteratureAgent:
         # 加载 Agent 的 Prompt（LangChain Hub 或自定义）
         self.agent_prompt = ChatPromptTemplate.from_messages([
             ("system", PROMPT_AGENT_SYSTEM),  # 系统指令（固定）
+            ("system", "{history_summary}"),  # 新增对话历史总结摘要
             MessagesPlaceholder("chat_history", optional=True),  # 对话历史（动态）
             ("human", "{input}"),  # 当前用户输入（动态）
             MessagesPlaceholder("agent_scratchpad")  # Agent执行过程记录（自动填充）
@@ -71,12 +109,65 @@ class LiteratureAgent:
             tools=self.tools,
             prompt=self.agent_prompt
         )
+        # 创建不带记忆的Agent执行器
         self.agent_executor = AgentExecutor(agent=self.agent,
                                             tools=self.tools,
                                             verbose=True,  # verbose=True 可用于调试，输出详细日志
                                             # max_iterations=1,  # 限制只使用一次工具函数
                                             return_intermediate_steps=True  # 启用中间步骤捕获，能直接获取工具调用结果
                                             )
+        # 创建带记忆的Agent执行器（RunnableWithMessageHistory+FileChatMessageHistory）
+        self.agent_memory_executor = RunnableWithMessageHistory(
+            AgentExecutor(
+                agent=self.agent,
+                tools=self.tools,
+                verbose=True,
+                return_intermediate_steps=True
+            ),
+            self._get_message_history,  # 记忆获取方法，获取原始对话记录
+            input_messages_key="input",
+            history_messages_key="chat_history",
+        )
+
+    def _setup_memory(self):
+        """初始化记忆存储目录"""
+        self.MEMORY_DIR = Path(AGENT_MEMORY_DIR)
+        self.MEMORY_DIR.mkdir(exist_ok=True)
+
+    def _get_message_history(self, session_id: str):
+        """获取指定会话的记忆"""
+        if not session_id:
+            raise ValueError("session_id不能为空")
+
+        file_path = self.MEMORY_DIR / f"{session_id}.json"
+        # 直接返回最后10条消息
+        return LimitedHistory(str(file_path))
+        # return FileChatMessageHistory(str(file_path))
+
+        # return ConversationSummaryBufferMemory(
+        #     llm=self.llm,
+        #     max_token_limit=1000,  # 根据模型调整
+        #     chat_memory=FileChatMessageHistory(str(file_path)),
+        #     memory_key="chat_history",
+        #     return_messages=True
+        # )
+
+    def _get_summary_memory(self, session_id: str):
+        """始化摘要记忆"""
+        file_path = self.MEMORY_DIR / f"{session_id}.json"
+        return ConversationSummaryBufferMemory(
+            llm=self.llm,
+            max_token_limit=1000,  # 最多保留的token数量，根据模型调整
+            chat_memory=FileChatMessageHistory(str(file_path)),
+            memory_key="chat_history",
+            return_messages=True
+        )
+
+    def _count_tokens(self, text: str) -> int:
+        """使用tiktoken精确计算文本的token数"""
+        return len(self.encoder.encode(text))
+
+    # 不带记忆的函数方法
 
     async def translate(self, text: str, source_language: str, translated_language: str, style: str) -> str:
         """文献翻译入口方法，根据style选择不同的翻译工具"""
@@ -123,14 +214,14 @@ class LiteratureAgent:
         })
         # print("Response:", response)  # 打印完整的响应内容
 
-        literature_summary=""
+        literature_summary = ""
         # 如果是文献总结工具，记录工具返回结果
         if response.get("intermediate_steps"):
-            for action,result in response["intermediate_steps"]:
-                if action.tool== "LiteratureSummarizer":
+            for action, result in response["intermediate_steps"]:
+                if action.tool == "LiteratureSummarizer":
                     literature_summary += str(result)
         # print("文献总结结果：", literature_summary)
-        final_response = literature_summary+"\n\n" + response["output"]  # 将总结结果和最终输出合并
+        final_response = literature_summary + "\n\n" + response["output"]  # 将总结结果和最终输出合并
         # print("最终输出：",final_response)
         return final_response
 
@@ -161,3 +252,46 @@ class LiteratureAgent:
         final_response += "=== Agent 最终输出 ===\n" + response["output"]
         # print(final_response)
         return final_response
+
+    # 带记忆的函数方法
+    async def talk_with_memory(self, user_input: str, session_id: str) -> str:
+        """与Agent进行对话（新增session_id参数）"""
+        # 输入token验证
+        input_tokens = self._count_tokens(user_input)
+        limited_tokens = 3000  # 限制的最大token数
+        if input_tokens > limited_tokens:
+            raise ValueError(
+                f"输入内容过长（{input_tokens} tokens）。"
+                f"请将内容缩短至1500 tokens以内（约{limited_tokens * 0.8}个英文单词或{limited_tokens //1.5 }个中文字）。"
+            )
+        # 以下实现对话
+        config = RunnableConfig(configurable={"session_id": session_id})  # 使用正确的配置类型（用session_id确定对话）
+        memory = self._get_summary_memory(session_id)
+
+        history_summary = memory.moving_summary_buffer  # 获取历史摘要
+        # print("历史摘要：", history_summary)  # 打印历史摘要内容，便于调试
+        response = await self.agent_memory_executor.ainvoke(
+            {
+                "input": user_input,
+                "history_summary": history_summary  # 将历史摘要传入
+            },
+            config=config  # 传入正确类型的配置
+        )
+        # print("Response:", response)  # 打印完整的响应内容
+        return response["output"]
+        # literature_summary=""
+        # # 如果是文献总结工具，记录工具返回结果
+        # if response.get("intermediate_steps"):
+        #     for action,result in response["intermediate_steps"]:
+        #         if action.tool== "LiteratureSummarizer":
+        #             literature_summary += str(result)
+        # # print("文献总结结果：", literature_summary)
+        # final_response = literature_summary+"\n\n" + response["output"]  # 将总结结果和最终输出合并
+        # # print("最终输出：",final_response)
+        # return final_response
+
+    async def clear_history(self, session_id: str):
+        """清除指定 session 的历史对话"""
+        file_path = self.MEMORY_DIR / f"{session_id}.json"
+        if file_path.exists():
+            os.remove(file_path)

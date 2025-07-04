@@ -7,24 +7,24 @@ summary_need_text = """请你帮我总结一下文献的内容：发病率呈现
 async def main():
     agent = LiteratureAgent()
 
-
-    # 测试与Agent交互
+    # 一、不带记忆的函数方法测试
+    # 1.测试与Agent交互
     # （1）测试翻译工具
     # user_input = "请你翻译：我的呼吸在灯光的波纹里，遥遥地望着村庄边畔的断崖，断崖仍然在它的世界里。断崖的形象在我的意念里。我为它在我的思维里安排了一个位置，支撑起我的信念，滤得我的目光越来越纯净。"
     # （2）测试文献搜索工具
     # user_input = "请你帮我找2个2021年之前的有关多元回归模型的文献。"
     # （3）测试文献内容总结工具
-    user_input= summary_need_text
+    # user_input= summary_need_text
     # response = await agent.agent_executor.ainvoke({"input": user_input,"urn_intermediate_steps": True})# 启用中间步骤捕获，能直接获取工具调用结果
     # print(response)
 
-    # 测试通用翻译工具
+    # 2.测试通用翻译工具
     # general_translation= await agent.agent_executor.ainvoke({
     #     "input":"请你用通用风格翻译工具翻译如下文本，从中文到英文：我的呼吸在灯光的波纹里，遥遥地望着村庄边畔的断崖，断崖仍然在它的世界里。断崖的形象在我的意念里。我为它在我的思维里安排了一个位置，支撑起我的信念，滤得我的目光越来越纯净。",
     # })
     # print(general_translation)
 
-    # 测试翻译工具入口方法函数
+    # 3.测试翻译工具入口方法函数
     # general_translation = await agent.translate(
     #     text="p值",
     #     source_language="Chinese",
@@ -41,7 +41,7 @@ async def main():
     # )
     # print("翻译内容：",academic_translation)
 
-    # 测试文献总结工具入口方法函数
+    # 4.测试文献总结工具入口方法函数
     # summary = await agent.summary(
     #     text=summary_need_text,
     #     language="Chinese",
@@ -49,10 +49,20 @@ async def main():
     # )
     # print("文献总结内容：", summary)  # 输出总结的文本内容
 
-    # 测试与Agent对话
+    # 5.测试与Agent对话
     # response = await agent.talk(user_input)
     # print("与Agent对话的响应：", response)  # 输出与Agent对话的响应内容
 
+    # 二、带记忆的函数方法测试
+    # 1.测试与Agent对话
+    response = await agent.talk_with_memory(
+        session_id="1",  # 使用唯一的会话ID来维持对话历史
+        user_input="hello？"
+    )
+    # print("与带记忆的Agent对话的响应：", response)  # 输出与Agent对话的响应内容
+    # 2，测试清除对话历史
+    # await agent.clear_history(session_id="1")
+    # print("对话历史已清除。")
 
 # 运行异步函数
 asyncio.run(main())

@@ -28,3 +28,6 @@ KNOWLEDGE_BASE_PATH=fr'D:\Desktop\Qizhenwenzhi_Competition\LitMind\knowledge_bas
 
 # 向量存储路径（向量知识库）
 VECTOR_STORE_PATH=fr'D:\Desktop\Qizhenwenzhi_Competition\LitMind\vectorstore'
+
+# agent记忆目录
+AGENT_MEMORY_DIR = fr'D:\Desktop\Qizhenwenzhi_Competition\LitMind\literature_agent_histories'

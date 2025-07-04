@@ -102,7 +102,8 @@ async def update_literatures(literature_in: LiteratureIn,
         literature_changed["theme_auto"] = theme
     else:
         literature_changed["theme_auto"] = literatures_existing.theme_auto
-    await Literature.filter(doi=literature_in.doi, users__username=current_user.username).update(**literature_changed)
+
+    await Literature.filter(id=literatures_existing.id).update(**literature_changed)
     return create_response("success", 200, literature_changed)
 
 
