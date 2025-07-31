@@ -49,7 +49,7 @@ class LiteratureIn(BaseModel):
 
 
 class FilenameIn(BaseModel):
-    filename: List[str]
+    filenames: List[str]
 
 
 # 定义排序方式的枚举
@@ -195,6 +195,7 @@ class SummaryIn(BaseModel):
 
 class TalkIn(BaseModel):
     text: str
+    filenames: List[str] = None  # 可选的文件名，用于上传文件时
 
 
 class ThemeIn(BaseModel):

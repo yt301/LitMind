@@ -167,6 +167,19 @@ class LiteratureAgent:
         """使用tiktoken精确计算文本的token数"""
         return len(self.encoder.encode(text))
 
+    def _truncate_by_tokens(self, text: str, max_tokens: int) -> str:
+        """按token数精确截断文本，避免截断半个单词或乱码
+        Args:
+            text: 原始文本
+            max_tokens: 允许的最大token数
+        Returns:
+            截断后的文本（token数 ≤ max_tokens）
+        """
+        tokens = self.encoder.encode(text)  # 使用类中已有的encoder（tiktoken）
+        if len(tokens) <= max_tokens:
+            return text
+        return self.encoder.decode(tokens[:max_tokens])  # 只保留前max_tokens个token
+
     # 不带记忆的函数方法
 
     async def translate(self, text: str, source_language: str, translated_language: str, style: str) -> str:
@@ -254,16 +267,51 @@ class LiteratureAgent:
         return final_response
 
     # 带记忆的函数方法
-    async def talk_with_memory(self, user_input: str, session_id: str) -> str:
+    async def talk_with_memory(self, user_input: str, session_id: str, file_paths: list[str] = None) -> str:
         """与Agent进行对话（新增session_id参数）"""
-        # 输入token验证
+        # 用户输入的token验证
         input_tokens = self._count_tokens(user_input)
-        limited_tokens = 3000  # 限制的最大token数
-        if input_tokens > limited_tokens:
+        input_limited_tokens = 3000  # 用户输入限制的最大token数
+        if input_tokens > input_limited_tokens:
             raise ValueError(
                 f"输入内容过长（{input_tokens} tokens）。"
-                f"请将内容缩短至1500 tokens以内（约{limited_tokens * 0.8}个英文单词或{limited_tokens //1.5 }个中文字）。"
+                f"请将内容缩短至1500 tokens以内（约{input_limited_tokens * 0.8}个英文单词或{input_limited_tokens //1.5 }个中文字）。"
             )
+
+        # 处理文件内容（使用现有的read_file_content函数）
+        file_contents = []
+        total_file_tokens = 0
+        file_limited_tokens = 3000  # 文件内容限制的最大token数
+
+        if file_paths:
+            for file_path in file_paths:
+                try:
+                    from tools.translations_tools import read_file_content
+                    content = read_file_content(file_path)
+                    content_tokens = self._count_tokens(content)
+
+                    # 截断超限内容
+                    remaining_tokens = file_limited_tokens - total_file_tokens
+                    if content_tokens > remaining_tokens:
+                        content = self._truncate_by_tokens(content, remaining_tokens)
+                        # print(f"文件 {os.path.basename(file_path)} 内容超出限制，已截断")
+
+                    file_contents.append(f"文件内容({os.path.basename(file_path)}):\n{content}")
+                    total_file_tokens += self._count_tokens(content)
+
+                    if total_file_tokens >= file_limited_tokens:
+                        # print(f"文件内容已达token上限（{file_limited_tokens}）")
+                        break
+
+                except Exception as e:
+                    print(f"读取文件 {file_path} 失败: {str(e)}")
+
+
+        # 构建完整输入
+        full_input = user_input
+        if file_contents:
+            full_input += "\n\n=== 附加文件内容 ===\n" + "\n\n".join(file_contents)
+
         # 以下实现对话
         config = RunnableConfig(configurable={"session_id": session_id})  # 使用正确的配置类型（用session_id确定对话）
         memory = self._get_summary_memory(session_id)
@@ -272,7 +320,7 @@ class LiteratureAgent:
         # print("历史摘要：", history_summary)  # 打印历史摘要内容，便于调试
         response = await self.agent_memory_executor.ainvoke(
             {
-                "input": user_input,
+                "input": full_input,
                 "history_summary": history_summary  # 将历史摘要传入
             },
             config=config  # 传入正确类型的配置

@@ -95,9 +95,9 @@ async def delete_files(filename_in: FilenameIn, current_user: User = Depends(get
     result = {
         "success": [],
         "error": [],
-        "total": len(filename_in.filename)  # 统计删除文件总数
+        "total": len(filename_in.filenames)  # 统计删除文件总数
     }
-    for file in filename_in.filename:
+    for file in filename_in.filenames:
         filepath = fr"{FILE_PATH}\{current_user.id}\{file}"  # 拼接文件路径，解码文件名
         if not os.path.exists(filepath):
             result["error"].append({"filename": file, "reason": "文件不存在！"})
@@ -127,8 +127,8 @@ async def download_files(filename_in: FilenameIn, current_user: User = Depends(g
     if not os.path.exists(user_dir):
         return create_response("error", 404, "用户目录不存在")
     # 处理单个文件下载
-    if len(filename_in.filename) == 1:
-        file = filename_in.filename[0]
+    if len(filename_in.filenames) == 1:
+        file = filename_in.filenames[0]
         filepath = os.path.join(user_dir, file)
 
         if not os.path.exists(filepath):
